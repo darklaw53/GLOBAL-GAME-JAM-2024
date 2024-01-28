@@ -30,7 +30,7 @@ public class CharController : MonoBehaviour
     public float blinkDuration = 2f;
     public float blinkInterval = 0.2f;
 
-    bool inputDisabled;
+    public bool inputDisabled;
     bool lookingForGround;
 
     public float knockbackForce = 3f;
