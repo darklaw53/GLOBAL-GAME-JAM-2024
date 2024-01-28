@@ -7,15 +7,16 @@ public class ShooterEnemy : enemy
     public Transform player;
     public GameObject projectilePrefab;
     public Transform firePoint;
-    public float shootInterval = 2f; // Time between shots
+    public float shootInterval = 3f;
     public float projectileSpeed = 10f;
 
     private bool isFacingRight = true;
     private float timeSinceLastShot;
 
+    public Animator animator;
+
     private void Update()
     {
-        // Flip the enemy if the player is behind it
         if (player.position.x < transform.position.x && isFacingRight)
         {
             Flip();
@@ -25,9 +26,8 @@ public class ShooterEnemy : enemy
             Flip();
         }
 
-        // Shoot at intervals
         timeSinceLastShot += Time.deltaTime;
-        if (timeSinceLastShot >= shootInterval)
+        if (timeSinceLastShot >= shootInterval && Vector3.Distance(player.transform.position, transform.position) < 10)
         {
             Shoot();
             timeSinceLastShot = 0f;
@@ -36,7 +36,6 @@ public class ShooterEnemy : enemy
 
     private void Flip()
     {
-        // Flip the enemy horizontally
         isFacingRight = !isFacingRight;
         Vector3 scale = transform.localScale;
         scale.x *= -1;
@@ -45,11 +44,16 @@ public class ShooterEnemy : enemy
 
     private void Shoot()
     {
-        // Instantiate a projectile at the firePoint
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        animator.SetBool("singing", true);
+        Invoke("StopSinging", 1.5f);
 
-        // Set the projectile's velocity
-        Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
-        projectileRb.velocity = isFacingRight ? new Vector2(projectileSpeed, 0f) : new Vector2(-projectileSpeed, 0f);
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        projectile.GetComponent<MusicalNote>().rRight = isFacingRight;
+        projectile.GetComponent<MusicalNote>().referenceTransform = transform;
+    }
+
+    void StopSinging()
+    {
+        animator.SetBool("singing", false);
     }
 }

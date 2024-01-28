@@ -13,11 +13,11 @@ TagManager:
   - Water
   - UI
   - enemy
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Death
+  - Platform
+  - PlatformNoClip
+  - Player
+  - MusicAttack
   - 
   - 
   - 

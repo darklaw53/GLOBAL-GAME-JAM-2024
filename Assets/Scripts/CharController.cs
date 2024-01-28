@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -34,6 +35,13 @@ public class CharController : MonoBehaviour
 
     public float knockbackForce = 3f;
 
+    public float doubleTapTimeThreshold = 0.2f; 
+
+    private bool isSKeyPressed = false;
+    private float timeSinceSKeyDown = 0f;
+
+    public Animator anim;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -41,8 +49,8 @@ public class CharController : MonoBehaviour
 
     private void Update()
     {
-        // Check if the player is grounded
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        if (isGrounded) anim.SetTrigger("HitTheFloor");
 
         if (lookingForGround && isGrounded)
         {
@@ -69,13 +77,26 @@ public class CharController : MonoBehaviour
     void InputDetection()
     {
         horizontalInput = Input.GetAxis("Horizontal");
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        if (horizontalInput != 0) anim.SetBool("Walking", true);
+        else anim.SetBool("Walking", false);
+
+        anim.SetFloat("VerticalMove", rb.velocity.y);
+
+        DoubleTapDetect();
+
+        if (isGrounded && (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)))
+        {
+            if (isGrounded && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
+            {
+                gameController.FallThrough();
+            }
+        }
+        else if (isGrounded && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
-        // Player shooting
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
             Shoot();
         }
@@ -90,17 +111,10 @@ public class CharController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.transform.tag == "enemy") TakeDamage(1, collision.transform);
-    }
-
     private void Shoot()
     {
-        // Instantiate a projectile at the firePoint
         GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
-        // Set the projectile's velocity
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (facingRight) projectileRb.velocity = new Vector2(projectileSpeed, 0f);
         else projectileRb.velocity = new Vector2(-projectileSpeed, 0f);
@@ -121,7 +135,11 @@ public class CharController : MonoBehaviour
             }
 
             health -= value;
-            if (health < 1) gameController.GameOver();
+            if (health < 1)
+            {
+                inputDisabled = true;
+                gameController.GameOver();
+            }
         }
     }
 
@@ -134,26 +152,20 @@ public class CharController : MonoBehaviour
     IEnumerator BlinkCharacter()
     {
         iFrames = true;
-        while (true) // Infinite loop for continuous blinking, you might want to adjust this condition based on your needs
+        while (true)
         {
-            // Set the character sprite to be invisible
             spriteRenderer.enabled = false;
 
-            // Wait for a short interval
             yield return new WaitForSeconds(blinkInterval);
 
-            // Set the character sprite to be visible
             spriteRenderer.enabled = true;
 
-            // Wait for a short interval
             yield return new WaitForSeconds(blinkInterval);
 
-            // Check if the total blink duration has been reached
-            blinkDuration -= blinkInterval * 2; // Subtracting twice the interval because we have two waits in each iteration
+            blinkDuration -= blinkInterval * 2; 
 
             if (blinkDuration <= 0)
             {
-                // If the total blink duration is reached, exit the loop
                 break;
             }
         }
@@ -166,5 +178,36 @@ public class CharController : MonoBehaviour
 
         inputDisabled = true;
         StartCoroutine(LookForGround());
+    }
+
+    private void OnDestroy()
+    {
+        inputDisabled = true;
+        gameController.GameOver();
+    }
+
+    void DoubleTapDetect()
+    {
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            if (!isSKeyPressed)
+            {
+                isSKeyPressed = true;
+                timeSinceSKeyDown = Time.time;
+            }
+            else
+            {
+                if (Time.time - timeSinceSKeyDown <= doubleTapTimeThreshold)
+                {
+                    gameController.FallThrough();
+                    isSKeyPressed = false; 
+                }
+                else
+                {
+                    isSKeyPressed = false;
+                    timeSinceSKeyDown = 0f;
+                }
+            }
+        }
     }
 }

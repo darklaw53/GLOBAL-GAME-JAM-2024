@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("enemy"))
         {
@@ -18,11 +18,11 @@ public class Bullet : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Player"))
         {
-            CharController charScript = collision.gameObject.GetComponent<CharController>();
+            hitbox charScript = collision.gameObject.GetComponent<hitbox>();
 
             if (charScript != null)
             {
-                charScript.TakeDamage(1, transform);
+                charScript.player.TakeDamage(1, transform);
             }
         }
         Destroy(gameObject);
