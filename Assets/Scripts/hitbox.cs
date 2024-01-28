@@ -14,5 +14,12 @@ public class hitbox : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.tag == "enemy") player.TakeDamage(1, collision.transform);
+
+        if (collision.transform.tag == "Coin")
+        { 
+            Destroy(collision.gameObject);
+
+            player.gameController.GainCoin();
+        }
     }
 }

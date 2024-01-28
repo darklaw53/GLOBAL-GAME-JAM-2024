@@ -15,6 +15,7 @@ public class Bullet : MonoBehaviour
             {
                 enemyScript.TakeDamage(1);
             }
+            Destroy(gameObject);
         }
         if (collision.gameObject.CompareTag("Player"))
         {
@@ -24,7 +25,8 @@ public class Bullet : MonoBehaviour
             {
                 charScript.player.TakeDamage(1, transform);
             }
+            Destroy(gameObject);
         }
-        Destroy(gameObject);
+        if (collision.gameObject.CompareTag("land")) Destroy(gameObject);
     }
 }

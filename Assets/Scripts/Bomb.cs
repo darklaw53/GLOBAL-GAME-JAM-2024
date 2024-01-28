@@ -13,9 +13,19 @@ public class Bomb : MonoBehaviour
     public CircleCollider2D circleCollider;
     public Rigidbody2D rigbody2D;
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Explode();
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            hitbox charScript = collision.gameObject.GetComponent<hitbox>();
+
+            if (charScript != null)
+            {
+                charScript.player.TakeDamage(1, transform);
+            }
+            Destroy(gameObject);
+        }
+        if (collision.gameObject.CompareTag("land")) Destroy(gameObject);
     }
 
     void Explode()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 public class CharController : MonoBehaviour
 {
@@ -115,6 +116,13 @@ public class CharController : MonoBehaviour
     {
         GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
+        if (!facingRight)
+        {
+            Vector3 scale = projectile.transform.localScale;
+            scale.x *= -1;
+            projectile.transform.localScale = scale;
+        }
+
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (facingRight) projectileRb.velocity = new Vector2(projectileSpeed, 0f);
         else projectileRb.velocity = new Vector2(-projectileSpeed, 0f);
@@ -132,6 +140,11 @@ public class CharController : MonoBehaviour
             else
             {
                 ApplyKnockback(Vector2.left);
+            }
+
+            for (int i = 0; i < value; i++)
+            {
+                gameController.LooseHealth();
             }
 
             health -= value;

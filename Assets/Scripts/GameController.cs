@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static Unity.VisualScripting.Metadata;
 
 public class GameController : MonoBehaviour
@@ -13,7 +15,18 @@ public class GameController : MonoBehaviour
     public GameObject allPlatforms;
     public LayerMask layerToRemove;
 
+    public Image heart1, heart2, heart3, heart4, heart5;
+    public Sprite fullHeart, emptyheart;
+
     bool paused;
+
+    public TextMeshProUGUI score;
+    int cash = -1;
+
+    private void Start()
+    {
+        score.text = "" + cash;
+    }
 
     private void Update()
     {
@@ -91,5 +104,20 @@ public class GameController : MonoBehaviour
             winMenu.SetActive(true);
             Time.timeScale = 0f;
         }
+    }
+
+    public void LooseHealth()
+    {
+        if (heart5.sprite == fullHeart) heart5.sprite = emptyheart;
+        else if (heart4.sprite == fullHeart) heart4.sprite = emptyheart;
+        else if (heart3.sprite == fullHeart) heart3.sprite = emptyheart;
+        else if (heart2.sprite == fullHeart) heart2.sprite = emptyheart;
+        else if (heart1.sprite == fullHeart) heart1.sprite = emptyheart;
+    }
+
+    public void GainCoin()
+    {
+        cash++;
+        score.text = "" + cash;
     }
 }

@@ -16,6 +16,15 @@ public class FlyingBomberEnemy : enemy
 
     public float projectileSpeed = 10f;
 
+    private Rigidbody2D rb;
+    private float previousVelocityX;
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        previousVelocityX = rb.velocity.x;
+    }
+
     private void Update()
     {
         // Move between two points
@@ -39,20 +48,27 @@ public class FlyingBomberEnemy : enemy
 
     private void CheckAndFlip()
     {
+        if (Mathf.Sign(previousVelocityX) != Mathf.Sign(rb.velocity.x))
+        {
+            // Horizontal velocity changed sign, execute your function here
+            FFlip();
+        }
+
+
         // Check if the enemy has reached a target point
         if (Vector2.Distance(transform.position, pointA.position) < 0.1f)
         {
-            Flip();
+            FFlip();
             isMovingToB = true;
         }
         else if (Vector2.Distance(transform.position, pointB.position) < 0.1f)
         {
-            Flip();
+            FFlip();
             isMovingToB = false;
         }
     }
 
-    private void Flip()
+    private void FFlip()
     {
         // Flip the enemy horizontally
         Vector3 scale = transform.localScale;
